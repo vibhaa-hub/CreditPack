@@ -1,0 +1,3 @@
+# FICTIONAL SAMPLE DATA - for testing the Credit Pack Workbench only.
+lending_line,drawn_gbp,limit_gbp,as_at,source
+wholesale,3600000,4500000,2026-11-01,facility system

@@ -1,0 +1,19 @@
+google-adk[db]>=1.0.0
+python-dotenv
+sqlalchemy>=2
+psycopg[binary]>=3
+asyncpg
+litellm
+pytest
+pyyaml
+pypdf
+pdfplumber          # PDF tables (layout-aware extraction)
+pytesseract         # OCR for scanned pages; needs the Tesseract binary (Dockerfile installs it)
+python-docx
+openpyxl
+itsdangerous
+fastapi
+uvicorn
+httpx
+python-multipart
+boto3

@@ -1,0 +1,3 @@
+FICTIONAL SAMPLE DATA - for testing the Credit Pack Workbench only.
+Valuer's letter, 2026-10-01. Subject: Acme Motors Ltd, debenture over stock.
+Basis: desktop valuation. Value: 6,600,000 GBP.

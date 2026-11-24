@@ -1,0 +1,134 @@
+# Distributed mode: one service per active LDU (cpa_agents/ldu/manifest.yaml), plus Postgres and
+# an S3-compatible object store. Every service runs the same image with a different LDU name.
+#
+#   docker compose up -d --build          # then open http://127.0.0.1:8001
+#   docker compose up -d --scale narrative-agent=2 --scale due-diligence-agent=2
+#
+# Model keys come from .env in this folder (MISTRAL_API_KEY / GOOGLE_API_KEY, CPA_MODEL), as for
+# start.ps1. This stack has its own database and bucket: it does not touch the cpa-postgres
+# container that start.ps1 uses. The passwords below are development defaults for a stack whose
+# database and object store are not published to the host; change them for anything shared.
+name: cpa-ldu
+
+x-ldu: &ldu
+  build: .
+  image: cpa-app:dev
+  restart: unless-stopped
+  environment: &env
+    CPA_LDU_MODE: distributed
+    DATABASE_URL: postgresql://postgres:${CPA_COMPOSE_PG_PASSWORD:-cpa-dev-only}@postgres:5432/cpa
+    CPA_FILE_STORE: s3
+    CPA_S3_BUCKET: cpa-uploads
+    CPA_S3_ENDPOINT_URL: http://objectstore:8333
+    AWS_ACCESS_KEY_ID: ${CPA_COMPOSE_S3_USER:-cpa-s3}
+    AWS_SECRET_ACCESS_KEY: ${CPA_COMPOSE_S3_PASSWORD:-cpa-s3-dev-only}
+    AWS_DEFAULT_REGION: us-east-1
+    CPA_EXTRACTION_URL: http://document-extraction:8080
+    CPA_ADAPTERS_URL: http://external-adapters:8080
+    CPA_MODEL: ${CPA_MODEL:-gemini-2.5-flash}
+    GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+    GOOGLE_GENAI_USE_VERTEXAI: ${GOOGLE_GENAI_USE_VERTEXAI:-FALSE}
+    MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+    CPA_WORKBENCH_SECRET: ${CPA_WORKBENCH_SECRET:-}
+  depends_on: &deps
+    init:
+      condition: service_completed_successfully
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${CPA_COMPOSE_PG_PASSWORD:-cpa-dev-only}
+      POSTGRES_DB: cpa
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cpa"]
+      interval: 5s
+      retries: 20
+
+  # S3-compatible object store for uploads (SeaweedFS; MinIO no longer publishes public images)
+  objectstore:
+    image: chrislusf/seaweedfs:3.80
+    restart: unless-stopped
+    command: ["server", "-dir=/data", "-s3", "-s3.config=/etc/seaweedfs/s3.json"]
+    configs:
+      - source: s3_identities
+        target: /etc/seaweedfs/s3.json
+    volumes: [objectdata:/data]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9333/cluster/status"]
+      interval: 5s
+      retries: 30
+
+  # creates the tables and the bucket once, before any LDU starts
+  init:
+    <<: *ldu
+    restart: "no"
+    command: ["init"]
+    healthcheck: {disable: true}
+    depends_on:
+      postgres: {condition: service_healthy}
+      objectstore: {condition: service_healthy}
+
+  # ---- api / static LDUs ----
+  workbench-api:
+    <<: *ldu
+    command: ["run", "workbench-api"]
+    ports: ["127.0.0.1:8001:8080"]          # the workbench (it also serves the UI bundle)
+  workbench-ui:
+    <<: *ldu
+    command: ["run", "workbench-ui"]
+    ports: ["127.0.0.1:8002:8080"]
+  document-extraction:
+    <<: *ldu
+    command: ["run", "document-extraction"]
+  external-adapters:
+    <<: *ldu
+    command: ["run", "external-adapters"]
+
+  # ---- worker LDU ----
+  case-orchestrator:
+    <<: *ldu
+    command: ["run", "case-orchestrator"]
+
+  # ---- agent LDUs (scale any of these on its own) ----
+  intake-agent:
+    <<: *ldu
+    command: ["run", "intake-agent"]
+  entity-agent:
+    <<: *ldu
+    command: ["run", "entity-agent"]
+  evidence-agent:
+    <<: *ldu
+    command: ["run", "evidence-agent"]
+  master-data-agent:
+    <<: *ldu
+    command: ["run", "master-data-agent"]
+  due-diligence-agent:
+    <<: *ldu
+    command: ["run", "due-diligence-agent"]
+  financial-agent:
+    <<: *ldu
+    command: ["run", "financial-agent"]
+  narrative-agent:
+    <<: *ldu
+    command: ["run", "narrative-agent"]
+  pack-agent:
+    <<: *ldu
+    command: ["run", "pack-agent"]
+  post-approval-agent:
+    <<: *ldu
+    command: ["run", "post-approval-agent"]
+
+volumes:
+  pgdata:
+  objectdata:
+
+configs:
+  s3_identities:            # the one S3 identity the LDUs use (development credentials)
+    content: |
+      {"identities": [{"name": "cpa",
+                       "credentials": [{"accessKey": "${CPA_COMPOSE_S3_USER:-cpa-s3}",
+                                        "secretKey": "${CPA_COMPOSE_S3_PASSWORD:-cpa-s3-dev-only}"}],
+                       "actions": ["Admin", "Read", "Write", "List", "Tagging"]}]}

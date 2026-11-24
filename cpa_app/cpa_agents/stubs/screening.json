@@ -1,0 +1,7 @@
+{
+  "_note": "STUB screening data. Replace with the screening platform and adverse-media adapters. Names listed here return the given result; all others are clear.",
+  "sanctions_list_version": "STUB-2026-11",
+  "sanctions": {"HIT TEST PERSON": "potential_match"},
+  "adverse_media": {"HIT TEST PERSON": "potential_match"},
+  "credit_reference": {"01234567": {"provider": "Experian (STUB)", "score_band": "B", "ccjs": 0, "as_at": "2026-11-01"}}
+}

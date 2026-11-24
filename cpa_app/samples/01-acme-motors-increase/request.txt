@@ -1,0 +1,9 @@
+FICTIONAL SAMPLE DATA - for testing the Credit Pack Workbench only.
+New request via OEM referral. Dealer: Acme Motors Ltd, registered number 01234567.
+Case types: increased borrowing request. Source: OEM partner. Owner: Jane Smith (Account Manager).
+Lending request: increase the wholesale facility from 4,500,000 to 5,500,000 for stock funding.
+Terms and pricing proposed by the preparer: standard wholesale terms, pricing per rate card (no figures supplied).
+The dealer supplied the documents attached: application form, FY2025 and FY2024 audited accounts
+(also as the iXBRL accounts filed at Companies House),
+facility statement and the valuer's letter. Consent to searches and the data-protection notice were signed 2026-11-03.
+Please prepare everything up to the authorisation gate.

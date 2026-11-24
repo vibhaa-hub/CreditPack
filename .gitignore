@@ -1,0 +1,44 @@
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+# plaintext demo passwords
+cpa_app/demo_user.txt
+# user exports for docker cp (contain password hashes)
+users.csv
+*.pem
+*.key
+
+# --- Python ---
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Local data ---
+# SQLite store (cpa.db) and uploaded dealer documents
+cpa_app/cpa_agents/.adk/
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+cpa_app/samples/**/*.extract.json
+
+# --- Frontend ---
+node_modules/
+cpa_app/workbench/frontend/dist/
+*.tsbuildinfo
+
+# --- Editors / OS / tools ---
+.claude/settings.local.json
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db

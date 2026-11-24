@@ -1,0 +1,40 @@
+# Governed policy parameters (BR-G05). Owned by the policy owner, versioned, never fixed in code.
+# A value of null means NOT CONFIGURED: rules report it as a configuration gap and never guess.
+# Bump `version` on every change; gate results record the version they were evaluated under.
+version: "0.1-unset"
+owner: "TBC (Credit policy / Financial Crime Compliance)"
+
+validity_days:            # DT-5, OQ-06: maximum age of information before it is stale
+  registry_result: null           # Companies House
+  credit_reference_result: null   # Experian, Equifax
+  sanctions_screening: null
+  idv_result: null
+  adverse_media: null
+  financial_statements: null
+
+review_cadence:           # DT-4, OQ-05: dealer risk profile / lifecycle stage set -> months
+  # set_A: 1
+  # set_B: 3
+  # set_C: 6
+  # set_D: 12
+  {}
+
+tolerances:
+  cashflow_reconciliation_amount: null   # CALC-007: allowed |difference|; null = any difference flags
+  ownership_percentage_points: null      # BR-D10: allowed gap from 100% total ownership
+  reconciliation_amount: null            # REQ-044: allowed |difference| when figures are compared (tie-outs,
+                                         #   table totals, opening vs closing, versions, documents); null and
+  reconciliation_pct: null               #   reconciliation_pct null = any difference over 0.5 is reported
+
+# REQ-038/044: which version of a period's figures the analysis uses when several are held, best first.
+# PROPOSED baseline pending Credit policy confirmation. null = NOT CONFIGURED (the most recently
+# recorded version is used and flagged).
+financial_basis_precedence: [audited, unaudited_accounts, management, dealer_stated]
+
+reconciliation:
+  date_window_days: null   # REQ-044: how close two dates must be for figures at those dates to be compared
+                           #   (our drawn exposure vs borrowings in the accounts; stock valuation vs stock)
+
+recency_window_days: null   # REQ-006: how recent a closed case still counts as related
+escalation_criteria: null   # REQ-037, OQ-02: when a check result is escalated to Financial Crime Compliance
+fca_regulatory_scope: null  # REQ-030, OQ-01: which FCA regulatory checks apply

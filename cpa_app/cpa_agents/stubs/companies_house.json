@@ -1,0 +1,10 @@
+{
+  "_note": "STUB registry records keyed by registered number. Replace with the Companies House adapter. Unknown numbers return 'unavailable'.",
+  "01234567": {
+    "entity": {"name": "ACME MOTORS LIMITED", "registered_number": "01234567",
+               "registered_address": "1 Forecourt Way, Coventry CV1 1AA", "legal_form": "Private limited company"},
+    "directors": ["A. Director"],
+    "shareholders": [{"name": "A. Director", "pct": 100}],
+    "status": "active"
+  }
+}

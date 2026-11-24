@@ -1,0 +1,8 @@
+FICTIONAL SAMPLE DATA - for testing the Credit Pack Workbench only.
+New request from the field distribution team. Dealer: Brightway Cars Ltd, registered number 01234567.
+Case types: new dealer relationship. Source: field distribution team. Owner: Jane Smith (Account Manager).
+Lending request: new wholesale facility of 7,000,000 for stock funding; new franchise with an OEM partner.
+Terms and pricing proposed by the preparer: standard new-dealer terms (no figures supplied).
+Documents attached: application form, FY2025 audited accounts, FY2025 and FY2023 management accounts (unaudited).
+Consent to searches signed 2026-11-10. No data-protection notice has been received yet.
+Please prepare everything up to the authorisation gate.

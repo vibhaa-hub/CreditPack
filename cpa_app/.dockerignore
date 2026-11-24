@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+**/__pycache__
+**/*.pyc
+.pytest_cache
+cpa_agents/.adk
+workbench/frontend/node_modules
+workbench/frontend/dist
+workbench/frontend/tsconfig.tsbuildinfo
+tests
+samples/**/*.extract.json

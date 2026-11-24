@@ -1,0 +1,134 @@
+# Least Deployable Units (LDUs). See openspec/changes/split-into-least-deployable-units.
+# Every agent built by cpa_agents.mesh.agents.build() must appear in exactly one active agent LDU.
+# kind: agent (worker hosting agents) | api (HTTP service) | worker (non-LLM code) | static (UI bundle)
+# parallel: agents that run alongside others and write shared keys to their own `<key>@<agent>` partition.
+# concurrency: max concurrent model calls per replica. max_attempts: tries per model call on rate-limit,
+# timeout and server errors. model: overrides CPA_MODEL for this LDU (null = global). Each can be
+# overridden per LDU with CPA_LDU_<NAME>_CONCURRENCY / _MAX_ATTEMPTS / _MODEL (see cpa_agents/ldu/limits.py).
+version: 1
+
+ldus:
+  workbench-ui:
+    kind: static
+    status: active
+    ast_units: []
+    components: [workbench/frontend/dist]
+
+  workbench-api:
+    kind: api
+    status: active
+    ast_units: [DU-01, DU-02, DU-03, DU-04, DU-06, DU-07, DU-08, DU-09]   # their human gates
+    components: [workbench.app, workbench.permissions, workbench.users, workbench.gates]
+
+  case-orchestrator:
+    kind: worker
+    status: active
+    ast_units: []                    # Arch 3.2 Credit Pack Orchestrator
+    components: [cpa_agents.mesh.orchestrator]
+
+  intake-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-01]
+    agents: [intake_classifier]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  entity-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-03]
+    agents: [entity_structure]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  evidence-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-02]
+    agents: [document_ingestion, gap_consolidator]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  document-extraction:
+    kind: api
+    status: active
+    ast_units: [DU-02]
+    components: [cpa_agents.tools.documents.extract_text]
+
+  master-data-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-11]
+    agents: [bureau_external]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  due-diligence-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-04]
+    agents: [dd_sanctions, dd_identity, dd_adverse_media, dd_summary]
+    parallel: [dd_sanctions, dd_identity, dd_adverse_media]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  external-adapters:
+    kind: api
+    status: active
+    ast_units: [DU-03, DU-04, DU-11]
+    components: [companies_house, sanctions, adverse_media, credit_reference]
+
+  financial-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-05]
+    agents: [financial_analysis]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  narrative-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-06]
+    agents: [nd_business_background, nd_management_assessment, nd_conduct_performance, nd_security_esg, nd_critic]
+    parallel: [nd_business_background, nd_management_assessment, nd_conduct_performance, nd_security_esg]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  pack-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-07, DU-08]
+    agents: [pack_request, pack_validation, pack_transmit]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  post-approval-agent:
+    kind: agent
+    status: active
+    ast_units: [DU-09, DU-10]
+    agents: [post_approval]
+    concurrency: 4
+    max_attempts: 4
+    model: null
+
+  review-scheduler:
+    kind: worker
+    status: planned
+    ast_units: [DU-10]
+    components: []
+
+  telemetry:
+    kind: worker
+    status: planned
+    ast_units: [DU-12]
+    components: []
